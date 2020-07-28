@@ -1,0 +1,30 @@
+stages:
+  - build
+  - push
+  - clean
+
+before_script:
+  - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+
+build:
+  stage: build
+  script:
+    - docker build 
+      -t registry.macellan.net/docker-images/laravel-echo-server:${CI_JOB_ID} 
+      -t registry.macellan.net/docker-images/laravel-echo-server:latest .
+  tags:
+    - shell_runner
+
+push:
+  stage: push
+  script:
+    - docker push registry.macellan.net/docker-images/laravel-echo-server
+  tags:
+    - shell_runner
+    
+clean:
+  stage: clean
+  script:
+    - docker rmi $(docker images -q registry.macellan.net/docker-images/laravel-echo-server) || true
+  tags:
+    - shell_runner
